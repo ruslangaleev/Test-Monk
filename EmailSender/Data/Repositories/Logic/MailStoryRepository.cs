@@ -2,6 +2,7 @@
 using EmailSender.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace EmailSender.Data.Repositories.Logic
@@ -16,9 +17,14 @@ namespace EmailSender.Data.Repositories.Logic
             _mailStories = context.MailStories;
         }
 
-        public async Task Add(MailStory mailStory)
+        public async Task AddAsync(MailStory mailStory)
         {
             await _mailStories.AddAsync(mailStory);
+        }
+
+        public async Task<IEnumerable<MailStory>> GetAsync()
+        {
+            return await _mailStories.ToListAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using EmailSender.Data.Infrastructure;
 using EmailSender.Data.Repositories.Interfaces;
@@ -23,18 +24,12 @@ namespace EmailSender.Controllers
             _mailStoryRepository = mailStoryRepository ?? throw new ArgumentNullException(nameof(IMailStoryRepository));
         }
 
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
-        
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-        
+        [HttpGet]
+        public async Task<IEnumerable<MailStory>> Get()
+        {
+            return await _mailStoryRepository.GetAsync();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]NewMailModel model)
         {
@@ -42,7 +37,7 @@ namespace EmailSender.Controllers
             {
                 await _mailSender.SendAsync(model.MailFrom, model.Recipients, model.Body, model.Subject);
 
-                await _mailStoryRepository.Add(new MailStory
+                await _mailStoryRepository.AddAsync(new MailStory
                 {
                     Body = model.Body,
                     SendAt = DateTime.Now,
@@ -61,7 +56,7 @@ namespace EmailSender.Controllers
             }
             catch(Exception e)
             {
-                await _mailStoryRepository.Add(new MailStory
+                await _mailStoryRepository.AddAsync(new MailStory
                 {
                     Body = model.Body,
                     SendAt = DateTime.Now,
