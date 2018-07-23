@@ -1,7 +1,6 @@
 ﻿using EmailSender.ResourceModels;
 using EmailSender.Services.Interfaces;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using System;
@@ -20,6 +19,28 @@ namespace EmailSender.Services.Logic
 
         public async Task SendAsync(string mailFrom, string[] recipients, string body, string subject)
         {
+            // TODO: Проверка на валидность email'ов.
+
+            if (string.IsNullOrEmpty(mailFrom))
+            {
+                throw new ArgumentNullException($"Необходимо указать адрес отправителя. ParamName: {nameof(mailFrom)}");
+            }
+
+            if (recipients == null || recipients.Length == 0)
+            {
+                throw new ArgumentNullException($"Необходимо указать как минимум одного получателя. ParamName: {nameof(recipients)}");
+            }
+
+            if (string.IsNullOrEmpty(body))
+            {
+                throw new ArgumentNullException($"Необходимо указать сообщение. ParamName: {nameof(body)}");
+            }
+
+            if (string.IsNullOrEmpty(subject))
+            {
+                throw new ArgumentNullException($"Необходимо указать . ParamName: {nameof(subject)}");
+            }
+
             var mimeMessage = new MimeMessage();
             mimeMessage.From.Add(new MailboxAddress(mailFrom));
             foreach (var recipient in recipients)
