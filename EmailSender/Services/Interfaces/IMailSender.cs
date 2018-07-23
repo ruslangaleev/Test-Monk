@@ -8,13 +8,12 @@ namespace EmailSender.Services.Interfaces
     public interface IMailSender
     {
         /// <summary>
-        /// Отправляет письмо на электронные почты.
+        /// Выполнит рассылку указанным адресатам.
         /// </summary>
-        /// <param name="mailFrom"></param>
-        /// <param name="recipients"></param>
-        /// <param name="body"></param>
-        /// <param name="subject"></param>
-        /// <returns></returns>
+        /// <param name="mailFrom">Адрес отправителя.</param>
+        /// <param name="recipients">Адреса получателей.</param>
+        /// <param name="body">Текст сообщения.</param>
+        /// <param name="subject">Тема сообщения.</param>
         Task SendAsync(string mailFrom, string[] recipients, string body, string subject);
     }
 }

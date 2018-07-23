@@ -13,10 +13,24 @@ namespace EmailSender.Controllers
     [Route("api/mails")]
     public class MailController : Controller
     {
+        /// <summary>
+        /// Сервис отправки писем на электронную почту.
+        /// </summary>
         private readonly IMailSender _mailSender;
+
+        /// <summary>
+        /// Единица работы с БД.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
+
+        /// <summary>
+        /// Репозиторий для работы с историей сообщений.
+        /// </summary>
         private readonly IMailStoryRepository _mailStoryRepository;
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
         public MailController(IMailSender mailSender, IUnitOfWork unitOfWork, IMailStoryRepository mailStoryRepository)
         {
             _mailSender = mailSender ?? throw new ArgumentNullException(nameof(IMailSender));
@@ -24,12 +38,21 @@ namespace EmailSender.Controllers
             _mailStoryRepository = mailStoryRepository ?? throw new ArgumentNullException(nameof(IMailStoryRepository));
         }
 
+        /// <summary>
+        /// Вернет историю сообщений.
+        /// </summary>
+        /// <response code="200">Успешно вернет историю сообщений.</response>
         [HttpGet]
         public async Task<IEnumerable<MailStory>> Get()
         {
             return await _mailStoryRepository.GetAsync();
         }
 
+        /// <summary>
+        /// Выполнит рассылку указанным адресатам.
+        /// </summary>
+        /// <response code="200">Успешно разошлет письма всем адресатам.</response>
+        /// <response code="400">Не удалось доставить письмо адресатам.</response>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]NewMailModel model)
         {

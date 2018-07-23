@@ -1,4 +1,5 @@
-﻿using EmailSender.ResourceModels;
+﻿using EmailSender.Helpers;
+using EmailSender.ResourceModels;
 using EmailSender.Services.Interfaces;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
@@ -8,37 +9,64 @@ using System.Threading.Tasks;
 
 namespace EmailSender.Services.Logic
 {
+    /// <summary>
+    /// Сервис отправки писем на электронную почту.
+    /// </summary>
     public class MailSender : IMailSender
     {
+        /// <summary>
+        /// Конфигурация для подключения к SMTP серверу.
+        /// </summary>
         private readonly SmtpSettings _smtpSettings;
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
         public MailSender(IOptions<SmtpSettings> smtpSettings)
         {
             _smtpSettings = smtpSettings.Value ?? throw new ArgumentNullException(nameof(SmtpSettings));
         }
 
+        /// <summary>
+        /// Выполнит рассылку указанным адресатам.
+        /// </summary>
+        /// <param name="mailFrom">Адрес отправителя.</param>
+        /// <param name="recipients">Адреса получателей.</param>
+        /// <param name="body">Текст сообщения.</param>
+        /// <param name="subject">Тема сообщения.</param>
         public async Task SendAsync(string mailFrom, string[] recipients, string body, string subject)
         {
-            // TODO: Проверка на валидность email'ов.
-
             if (string.IsNullOrEmpty(mailFrom))
             {
-                throw new ArgumentNullException($"Необходимо указать адрес отправителя. ParamName: {nameof(mailFrom)}");
+                throw new ArgumentNullException(nameof(mailFrom), $"Необходимо указать адрес отправителя.");
+            }
+
+            if (!MailValidator.IsValid(mailFrom))
+            {
+                throw new ArgumentNullException(nameof(mailFrom), $"Адрес отправителя {mailFrom} указан не верно.");
             }
 
             if (recipients == null || recipients.Length == 0)
             {
-                throw new ArgumentNullException($"Необходимо указать как минимум одного получателя. ParamName: {nameof(recipients)}");
+                throw new ArgumentNullException(nameof(recipients), $"Необходимо указать как минимум одного получателя.");
+            }
+
+            foreach(var recipient in recipients)
+            {
+                if (!MailValidator.IsValid(recipient))
+                {
+                    throw new ArgumentNullException(nameof(recipient), $"Адрес получателя {recipient} указан не верно.");
+                }
             }
 
             if (string.IsNullOrEmpty(body))
             {
-                throw new ArgumentNullException($"Необходимо указать сообщение. ParamName: {nameof(body)}");
+                throw new ArgumentNullException(nameof(body), $"Необходимо указать сообщение.");
             }
 
             if (string.IsNullOrEmpty(subject))
             {
-                throw new ArgumentNullException($"Необходимо указать . ParamName: {nameof(subject)}");
+                throw new ArgumentNullException(nameof(subject), $"Необходимо указать тему сообщения.");
             }
 
             var mimeMessage = new MimeMessage();
